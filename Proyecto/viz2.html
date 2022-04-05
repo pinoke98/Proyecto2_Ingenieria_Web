@@ -32,7 +32,7 @@
     <div class="container-fluid padding" id="Experience">
         <div class="row welcome text-center">
             <div class="col-12">
-                <h1 class="display-4">Relaciones de Nacimientos</h1>
+                <h1 class="display-4">Relaciones de Peso/Talla y Nacimiento</h1>
             </div>
             <hr>
         </div>
@@ -46,25 +46,10 @@
                         <h4 class="card-title">Variables</h4>
                         <hr>
                         <form>
-                            <p>Seleccione la Variable del Eje X(Momento 1):</p>
-                            <select class="form-select" id="variableXvis2">
-                                <option id="Tratamiento">Tratamiento</option>
-                                <option id="Pretermino">Pretermino</option>
-                                <option id="BIRTH_cesarea">Cesarea</option>
-                                <option id="BIRTH_peso5">Peso</option>
-                                <option id="BIRTH_talla5">Talla</option>
-                                <option id="BIRTH_sexo5">Sexo</option>
-                                <option id="BIRTH_pc5">Circunferencia Cabeza</option>
-                            </select>
-                            <p>Seleccione la Variable del Eje Y(Momento 2):</p>
-                            <select class="form-select mb-4" id="variableYvis2">
-                                <option id="Tratamiento">Tratamiento</option>
-                                <option id="Pretermino">Pretermino</option>
-                                <option id="BIRTH_cesarea">Cesarea</option>
-                                <option id="BIRTH_peso5">Peso</option>
-                                <option id="BIRTH_talla5">Talla</option>
-                                <option id="BIRTH_sexo5">Sexo</option>
-                                <option id="BIRTH_pc5">Circunferencia Cabeza</option>
+                            <p>Seleccione la que variable quiere ver</p>
+                            <select class="form-select mb-4" id="variableGraf">
+                                <option id="Peso">Peso</option>
+                                <option id="Talla">Talla</option>
                             </select>
                             <button type="button" class="btn btn-primary" onclick="graficar()">Submit</button>
                         </form>
@@ -72,6 +57,9 @@
                             <g id="body" style="transform:translate(40px,10px)"></g>
                             <g id="yAxis"></g>
                             <g id="xAxis"></g>
+                        </svg>
+                        <svg id="chart">
+                            <g class="body"></g>
                         </svg>
                     </div>
                 </div>

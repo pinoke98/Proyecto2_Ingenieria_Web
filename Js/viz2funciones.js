@@ -1,30 +1,42 @@
+let body;
+let container;
 
 window.onload = function() {
-    graficar()
+    body = d3.select("#body")
+    container = d3.select("#container")
+    //graficar()
 }
 let element  = document.getElementById('carta');
-let arr = {"Tratamiento":"c",
-            "Pretermino":"c",
-            "BIRTH_cesarea":"c",
+let arr = {
             "BIRTH_peso5":"n",
             "BIRTH_talla5":"n",
-            "BIRTH_sexo5":"c",
-            "BIRTH_pc5":"n"
+            "FOLL12M_peso12": "n",
+            "FOLL12M_talla12": "n"
         }
 
-let variableX = document.getElementById("variableXvis2");
-var XSelected = variableX.options[variableX.selectedIndex].id.toString();
-let variableY = document.getElementById("variableYvis2");
-var YSelected = variableY.options[variableY.selectedIndex].id.toString();
+let variable = document.getElementById("variableGraf");
+var XSelected;
+var YSelected;
 
-let body = d3.select("#body")
-let container = d3.select("#container")
+
+function tipo(variable){
+    if(variable=="Peso"){
+        XSelected = "FOLL12M_peso12"
+        YSelected = "BIRTH_peso5"
+    } else{
+        XSelected = "BIRTH_talla5"
+        YSelected = "FOLL12M_talla12"
+    }
+}
+
+
 function graficar(){
     d3.csv("../Datos/Datos_Longitudinales.csv").then((data) => {
-        variableX = document.getElementById("variableXvis2");
-        XSelected = variableX.options[variableX.selectedIndex].id.toString();
-        variableY = document.getElementById("variableYvis2");
-        YSelected = variableY.options[variableY.selectedIndex].id.toString();
+        
+        variable = document.getElementById("variableGraf")
+        dato = variable.options[variable.selectedIndex].id.toString()
+        console.log(data[1].BIRTH_peso5)
+        tipo(dato)
         console.log(XSelected,YSelected)
         if(arr[XSelected] == "n"){
             var filteredData = data.filter(d => {
@@ -43,16 +55,28 @@ function graficar(){
 
         brush.on("brush", function (a,b) {
             let coords = d3.event.selection
+            let arr = []
             body.selectAll("circle")
                 .style("fill", function(d) {
                     let cx = d3.select(this).attr("cx");
                     let cy = d3.select(this).attr("cy");
+                    let data = d3.select(this).data()
+                    
 
                     let selected = isSelected(coords, cx, cy)
-                    return selected ? "red" : "blue"
+                    
+                    if(selected){
+                        arr.push(data)
+                        return "red"
+                    }
+                    return "blue"
                 })
-            
+                
         })
+
+    
+
+        
 
         body.append("g")
             .attr("class", "brush")
@@ -61,8 +85,8 @@ function graficar(){
 }
 
 function showData(clients) {
-    var bodyWidth = 1000;
-    var bodyHeight = 700;
+    var bodyWidth = 600;
+    var bodyHeight = 400;
     console.log(clients)
 
     let xExtent = d3.extent(clients, d => +d[XSelected])
@@ -125,7 +149,7 @@ function showData(clients) {
     container.call(zoom)
 
     
-
+    console.log("graficado")
 }
 
 function isSelected(coords, x, y) {
