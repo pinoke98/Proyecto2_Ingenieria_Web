@@ -41,13 +41,13 @@
     <div class="container-fluid padding mb-3">
         <div class="row padding justify-content-center">
             <div class="col-md-6 ">
-                <div class="card">
+                <div class="card" style=" width: auto; height: auto;">
                     <div class="card-body" id="carta">
-                        <h4 class="card-title">Votar</h4>
+                        <h4 class="card-title">Variables</h4>
                         <hr>
                         <form>
-                            <p>Seleccione la Variable del Eje X:</p>
-                            <select class="form-select" id="variableX">
+                            <p>Seleccione la Variable del Eje X(Momento 1):</p>
+                            <select class="form-select" id="variableXvis2">
                                 <option id="Tratamiento">Tratamiento</option>
                                 <option id="Pretermino">Pretermino</option>
                                 <option id="BIRTH_cesarea">Cesarea</option>
@@ -56,19 +56,23 @@
                                 <option id="BIRTH_sexo5">Sexo</option>
                                 <option id="BIRTH_pc5">Circunferencia Cabeza</option>
                             </select>
-                            <p>Seleccione la Variable del Eje Y:</p>
-                            <select class="form-select mb-4" id="variableY">
+                            <p>Seleccione la Variable del Eje Y(Momento 2):</p>
+                            <select class="form-select mb-4" id="variableYvis2">
                                 <option id="Tratamiento">Tratamiento</option>
                                 <option id="Pretermino">Pretermino</option>
                                 <option id="BIRTH_cesarea">Cesarea</option>
                                 <option id="BIRTH_peso5">Peso</option>
                                 <option id="BIRTH_talla5">Talla</option>
-                                <option id="BIRTH_sexo5"    >Sexo</option>
+                                <option id="BIRTH_sexo5">Sexo</option>
                                 <option id="BIRTH_pc5">Circunferencia Cabeza</option>
                             </select>
                             <button type="button" class="btn btn-primary" onclick="graficar()">Submit</button>
                         </form>
-                        <div id="my_dataviz"></div>   
+                        <svg id="container" height="500" width="auto">
+                            <g id="body" style="transform:translate(40px,10px)"></g>
+                            <g id="yAxis"></g>
+                            <g id="xAxis"></g>
+                        </svg>
                     </div>
                 </div>
             </div>
@@ -76,5 +80,5 @@
     </div>
 </body>
 <script src="/Js/d3.js"></script>
-<script src="/Js/Funciones.js"></script>
+<script src="/Js/viz2funciones.js"></script>
 </html>
