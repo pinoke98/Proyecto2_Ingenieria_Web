@@ -1,6 +1,8 @@
 let body;
 let container;
 let barchar = d3.select('#barchart');
+let barchart = d3.select("#barchart")
+
 
 let width = 400;
 let height = 200;
@@ -11,7 +13,7 @@ let margin = { left: 20, bottom: 20, right: 20, top: 20 }
 window.onload = function() {
     body = d3.select("#body")
     container = d3.select("#container")
-    barchar = d3.select('#barchart')
+    barchart = d3.select('#barchart')
     graficar()
 }
 
@@ -47,33 +49,30 @@ function graficar(){
         
         variable = document.getElementById("variableGraf")
         dato = variable.options[variable.selectedIndex].id.toString()
-        console.log(data[1].BIRTH_peso5)
+        //console.log(data[1].BIRTH_peso5)
         tipo(dato)
-        console.log(XSelected,YSelected)
+        //console.log(XSelected,YSelected)
         if(arr[XSelected] == "n"){
             var filteredData = data.filter(d => {
                 return d[XSelected] > 0
             })
-            console.log(filteredData)
+            //console.log(filteredData)
         }
         if(arr[YSelected] == "n"){
             var filteredData = data.filter(d => {
                 return d[YSelected] > 0
             })
         }
-        console.log(filteredData)
+        //console.log(filteredData)
         showData(filteredData)
         let brush = d3.brush();
         var arrData = [
             {type: 'SinCesaria', cantidad: 0},
             {type: 'Cesaria', cantidad: 0}
         ]
+
         brush.on("brush", function (a,b) {
             let coords = d3.event.selection
-            arrData = [
-                {type: 'SinCesaria', cantidad: 0},
-                {type: 'Cesaria', cantidad: 0}
-            ]
             body.selectAll("circle")
                 .style("fill", function(d) {
                     let cx = d3.select(this).attr("cx");
@@ -85,23 +84,87 @@ function graficar(){
                     if(selected){
                         data.forEach(element => {
                                 if(element["BIRTH_cesarea"]==0){
-                                    arrData[0]['cantidad']++ 
+                                    arrData[0]['cantidad']++
                                 }else{
                                     arrData[1]['cantidad']++
                                 }
                         });
                         return "red"
                     }
+                    
+                    //console.log(arrData)
+                    if(arrData[0]['cantidad']>0 || arrData[1]['cantidad']>0)
+                        drawBarChart(arrData)   
                     return "blue"
                 })
-                
+            
         })  
-        graficarBarras(arrData)
+        
         body.append("g")
             .attr("class", "brush")
             .call(brush);
     })
 }
+
+
+
+function drawBarChart(data) {
+    console.log(data)
+
+    var datas = [
+        {type: 'SinCesaria', cantidad: 70},
+        {type: 'Cesaria', cantidad: 80}
+    ]
+    
+    let margin = { left: 20, bottom: 20, right: 20, top: 20 }
+
+    let bodyWidth = width - margin.left - margin.right;
+    let bodyHeight = height - margin.top - margin.bottom;
+
+    let xScale = d3.scaleBand()
+        .domain(data.map(d => d.type))
+        .range([margin.left, width - margin.right])
+        .padding(0.2)
+
+    let yScale = d3.scaleLinear()
+        .range([height-margin.bottom, 0])
+        .domain([0, d3.max(data, d => d.cantidad)])
+
+    //console.log(yScale(data[0]))
+
+    barChartBody = barchart.select(".body")
+        .attr("transform", `translate(${margin.left},0)`)
+        .selectAll("rect")
+        .data(data.sort((a,b)=> d3.descending(a.score, b.score)))
+        
+
+    barChartBody.enter()
+        .append("rect")
+        .attr("width", xScale.bandwidth())
+        .attr("height", d => yScale(0) - yScale(d.cantidad))
+        .attr("y", (d) => {console.log(d.cantidad, d); return yScale(d.cantidad)})
+        .attr("x", (d) => {console.log(d.type); return xScale(d.type)})
+        .merge(barChartBody)
+        .attr("fill", "red")
+
+    barchar.select(".yAxis")
+        .attr('transform', `translate(${margin.left+30},0)`)
+        .call(d3.axisLeft(yScale).ticks(5))
+        .attr('font-size', '15px')
+
+    barchar.select(".xAxis")
+        .attr('transform', `translate(30,${height-20})`)
+        .call(d3.axisBottom(xScale).tickFormat(i=> data[i].type))
+        .attr('font-size', '20px')
+
+
+    barchar.node()
+
+
+    //console.log("done")
+}
+
+
 
 
 function graficarBarras(arr){
@@ -153,7 +216,7 @@ function graficarBarras(arr){
 function showData(clients) {
     var bodyWidth = 600;
     var bodyHeight = 400;
-    console.log(clients)
+    //console.log(clients)
 
     let xExtent = d3.extent(clients, d => +d[XSelected])
     let xScale = d3.scaleLinear().range([0, bodyWidth])
