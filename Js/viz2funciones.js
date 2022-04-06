@@ -1,11 +1,23 @@
 let body;
 let container;
+let barchar = d3.select('#barchart');
+
+let width = 400;
+let height = 200;
+
+let margin = { left: 20, bottom: 20, right: 20, top: 20 }
+
 
 window.onload = function() {
     body = d3.select("#body")
     container = d3.select("#container")
-    //graficar()
+    barchar = d3.select('#barchart')
+    graficar()
 }
+
+barchar.attr("height", height)
+barchar.attr("width", width)
+
 let element  = document.getElementById('carta');
 let arr = {
             "BIRTH_peso5":"n",
@@ -52,37 +64,91 @@ function graficar(){
         console.log(filteredData)
         showData(filteredData)
         let brush = d3.brush();
-
+        var arrData = [
+            {type: 'SinCesaria', cantidad: 0},
+            {type: 'Cesaria', cantidad: 0}
+        ]
         brush.on("brush", function (a,b) {
             let coords = d3.event.selection
-            let arr = []
+            arrData = [
+                {type: 'SinCesaria', cantidad: 0},
+                {type: 'Cesaria', cantidad: 0}
+            ]
             body.selectAll("circle")
                 .style("fill", function(d) {
                     let cx = d3.select(this).attr("cx");
                     let cy = d3.select(this).attr("cy");
                     let data = d3.select(this).data()
-                    
 
                     let selected = isSelected(coords, cx, cy)
                     
                     if(selected){
-                        arr.push(data)
+                        data.forEach(element => {
+                                if(element["BIRTH_cesarea"]==0){
+                                    arrData[0]['cantidad']++ 
+                                }else{
+                                    arrData[1]['cantidad']++
+                                }
+                        });
                         return "red"
                     }
                     return "blue"
                 })
                 
-        })
-
-    
-
-        
-
+        })  
+        graficarBarras(arrData)
         body.append("g")
             .attr("class", "brush")
             .call(brush);
     })
 }
+
+
+function graficarBarras(arr){
+    
+    barchar.append('svg')
+        .attr('height', height - margin.top -margin.bottom)
+        .attr('width', width - margin.left - margin.right)
+        .attr('viewBox', [0,0,width,height])
+
+    const x= d3.scaleBand()
+        .domain(d3.range(arr.length))
+        .range([margin.left, width - margin.right])
+        .padding(0.2)
+    
+    const y= d3.scaleLinear()
+        .domain([0,100])
+        .range([height-margin.bottom,margin.top])
+
+    barchar.append('g')
+        .attr('fill', 'red')
+        .attr('transform', `translate(${margin.left},${margin.bottom})`)
+        .selectAll('rect')
+        .data(arr.sort((a,b)=> d3.descending(a.score, b.score)))
+        .enter()
+        .append('rect')
+        .attr('x', (d,i)=>x(i))
+        .attr('y', (d) => y(d['cantidad']))
+        .attr("height", d =>  y(0) - y(d['cantidad']))  
+        .attr("width", x.bandwidth())
+        .merge(barchar)
+
+
+    barchar.append('g')
+        .attr('transform', `translate(0 ${height- margin.bottom})`)
+        .call(d3.axisBottom(x).tickFormat(i => arr[i].type))
+        .attr('font-size','20px')  
+    
+    barchar.append('g')
+        .attr('transform',`translate(${margin.left}, 0)`)
+        .call(d3.axisLeft(y).ticks(null, arr.format))
+        .attr('font-size', '20px')
+
+    barchar.node()
+
+}
+
+
 
 function showData(clients) {
     var bodyWidth = 600;
@@ -110,7 +176,6 @@ function showData(clients) {
         .transition()
         .attr("cx", d => xScale(+d[XSelected]))
         .attr("cy", d => yScale(+d[YSelected]))
-    
 
     d3.select("#yAxis")
         .style("transform", "translate(40px, 10px)")
@@ -152,6 +217,9 @@ function showData(clients) {
     console.log("graficado")
 }
 
+
+
+
 function isSelected(coords, x, y) {
     let x0 = coords[0][0],
         x1 = coords[1][0],
@@ -159,4 +227,15 @@ function isSelected(coords, x, y) {
         y1 = coords[1][1];
     
     return x0 <= x && x <= x1 && y0 <= y && y <= y1;
+}
+
+function showTooltip(text, coords) {
+    let x = coords[0];
+    let y = coords[1];
+
+    d3.select("#tooltip")
+        .style("display", "block")
+        .style("top", y)
+        .style("left", x)
+        .text(text)
 }
