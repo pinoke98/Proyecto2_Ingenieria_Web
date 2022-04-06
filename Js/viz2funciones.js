@@ -128,22 +128,22 @@ function drawBarChart(data) {
 
     let yScale = d3.scaleLinear()
         .range([height-margin.bottom, 0])
-        .domain([0, d3.max(data, d => d.cantidad)])
+        .domain([0, d3.max(data, d=> d.cantidad)])
 
     //console.log(yScale(data[0]))
 
     barChartBody = barchart.select(".body")
         .attr("transform", `translate(${margin.left},0)`)
-        .selectAll("rect")
+        .selectAll()
         .data(data.sort((a,b)=> d3.descending(a.score, b.score)))
         
 
     barChartBody.enter()
         .append("rect")
         .attr("width", xScale.bandwidth())
-        .attr("height", d => yScale(0) - yScale(d.cantidad))
-        .attr("y", (d) => {console.log(d.cantidad, d); return yScale(d.cantidad)})
-        .attr("x", (d) => {console.log(d.type); return xScale(d.type)})
+        .attr("height", d =>{console.log(yScale(0), yScale(d.cantidad)); return yScale(0) - yScale(d.cantidad)})
+        .attr("y", (d) => {return yScale(d.cantidad)})
+        .attr("x", (d) => {return xScale(d.type)})
         .merge(barChartBody)
         .attr("fill", "red")
 
@@ -154,7 +154,7 @@ function drawBarChart(data) {
 
     barchar.select(".xAxis")
         .attr('transform', `translate(30,${height-20})`)
-        .call(d3.axisBottom(xScale).tickFormat(i=> data[i].type))
+        .call(d3.axisBottom(xScale).tickFormat(i=> {return i}))
         .attr('font-size', '20px')
 
 
