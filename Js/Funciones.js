@@ -68,10 +68,8 @@ function showDataDisp(data) {
     var bodyWidth = element.offsetWidth;
     var bodyHeight = element.offsetHeight;
     //console.log(data);
-    if(join != null){
-        join.exit().remove()
-        console.log(join)
-    }
+    body.selectAll('rect').remove()
+    
     let variableX = document.getElementById("variableX");
     var XSelected = variableX.options[variableX.selectedIndex].id.toString();
     // console.log(XSelected);
@@ -113,13 +111,15 @@ function showDataDisp(data) {
 
     join.exit()
         .remove()
-    console.log(join)
+    // console.log(join)
 }
 
 function showDataBar1(data) {
     let element  = document.getElementById('carta');
     var bodyWidth = element.offsetWidth;
     var bodyHeight = element.offsetHeight;
+
+    body.selectAll('circle').remove()
 
     let variableX = document.getElementById("variableX");
     var XSelected = variableX.options[variableX.selectedIndex].id.toString();
@@ -168,6 +168,8 @@ function showDataBar2(data) {
     let element  = document.getElementById('carta');
     var bodyWidth = element.offsetWidth;
     var bodyHeight = element.offsetHeight;
+
+    body.selectAll('circle').remove()
 
     let variableX = document.getElementById("variableY");
     var XSelected = variableX.options[variableX.selectedIndex].id.toString();
