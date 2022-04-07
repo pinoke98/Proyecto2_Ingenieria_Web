@@ -71,39 +71,67 @@ function graficar(){
             {type: 'Cesaria', cantidad: 0}
         ]
 
+        var isAdded = []
+
         brush.on("brush", function (a,b) {
             let coords = d3.event.selection
+            resetGraph()
             body.selectAll("circle")
                 .style("fill", function(d) {
                     let cx = d3.select(this).attr("cx");
                     let cy = d3.select(this).attr("cy");
-                    let data = d3.select(this).data()
+                    
 
+
+                    console.log( 'datos brush', d)
                     let selected = isSelected(coords, cx, cy)
                     
                     if(selected){
-                        data.forEach(element => {
-                                if(element["BIRTH_cesarea"]==0){
-                                    arrData[0]['cantidad']++
-                                }else{
-                                    arrData[1]['cantidad']++
-                                }
-                        });
+                        if(isAdded.includes(d.id)){
+                            return "red"
+                        }
+                        
+                        if(d["BIRTH_cesarea"]==0 ){
+                            arrData[0]['cantidad']++
+                            isAdded.push(d.id)
+                        }else{
+                            arrData[1]['cantidad']++
+                            isAdded.push(d.id)
+                        }
                         return "red"
                     }
-                    
-                    //console.log(arrData)
-                    if(arrData[0]['cantidad']>0 || arrData[1]['cantidad']>0)
-                        drawBarChart(arrData)   
+        
+                      
                     return "blue"
                 })
-            
+                console.log("datos completos", arrData)
+                if(arrData[0]['cantidad']>0 || arrData[1]['cantidad']>0){
+                    drawBarChart(arrData)
+                    isAdded = []
+                    arrData = [
+                        {type: 'SinCesaria', cantidad: 0},
+                        {type: 'Cesaria', cantidad: 0}
+                    ]
+
+                }
         })  
-        
         body.append("g")
             .attr("class", "brush")
             .call(brush);
     })
+}
+
+function resetGraph(){
+    let arrData = [
+        {type: 'SinCesaria', cantidad: 0},
+        {type: 'Cesaria', cantidad: 0}
+    ]
+
+    drawBarChart(arrData)
+    barchar.selectAll('rect')
+        .attr('fill', 'white')
+        .attr("width", 0)
+        .attr("height", 0)
 }
 
 
@@ -111,11 +139,6 @@ function graficar(){
 function drawBarChart(data) {
     console.log(data)
 
-    var datas = [
-        {type: 'SinCesaria', cantidad: 70},
-        {type: 'Cesaria', cantidad: 80}
-    ]
-    
     let margin = { left: 20, bottom: 20, right: 20, top: 20 }
 
     let bodyWidth = width - margin.left - margin.right;
@@ -141,7 +164,7 @@ function drawBarChart(data) {
     barChartBody.enter()
         .append("rect")
         .attr("width", xScale.bandwidth())
-        .attr("height", d =>{console.log(yScale(0), yScale(d.cantidad)); return yScale(0) - yScale(d.cantidad)})
+        .attr("height", d =>{ return yScale(0) - yScale(d.cantidad)})
         .attr("y", (d) => {return yScale(d.cantidad)})
         .attr("x", (d) => {return xScale(d.type)})
         .merge(barChartBody)
@@ -154,7 +177,7 @@ function drawBarChart(data) {
 
     barchar.select(".xAxis")
         .attr('transform', `translate(30,${height-20})`)
-        .call(d3.axisBottom(xScale).tickFormat(i=> {return i}))
+        .call(d3.axisBottom(xScale).tickFormat(i=> {return i }))
         .attr('font-size', '20px')
 
 
