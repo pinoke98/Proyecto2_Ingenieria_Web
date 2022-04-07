@@ -32,6 +32,7 @@ svg.append("g")
 
 let body = d3.select("#body")
 let barchart = d3.select("#svg")
+let join;
 
 function graficar(){
     d3.csv("/Datos/Datos_Longitudinales.csv").then((data) => {
@@ -55,7 +56,7 @@ function graficar(){
         }else if(arr[XSelected] == "c" && arr[YSelected] == "n"){
             showDataBar1(filteredData)
         }else if(arr[XSelected] == "n" && arr[YSelected] == "c"){
-
+            showDataBar2(filteredData)
         }else{
 
         }
@@ -67,7 +68,10 @@ function showDataDisp(data) {
     var bodyWidth = element.offsetWidth;
     var bodyHeight = element.offsetHeight;
     //console.log(data);
-
+    if(join != null){
+        join.exit().remove()
+        console.log(join)
+    }
     let variableX = document.getElementById("variableX");
     var XSelected = variableX.options[variableX.selectedIndex].id.toString();
     // console.log(XSelected);
@@ -86,18 +90,18 @@ function showDataDisp(data) {
     let yScale = d3.scaleLinear().range([0, bodyHeight/1.5])
         .domain([yExtent[1]+yExtent[1]*0.1, yExtent[0]-yExtent[0]*0.1])
 
-    let join = body.selectAll("circle")
+    join = body.selectAll("circle")
         .data(data)
 
-    let newelements = join.enter()
+    join.enter()
         .append("circle")
         .style("fill", "blue")
         .style("r", "5")
-            
-    join.merge(newelements)
+        .merge(join)
         .transition()
-        .attr("cx", d => xScale(+d[XSelected]))
-        .attr("cy", d => yScale(+d[YSelected]))
+        .duration(1000)
+            .attr("cx", d => xScale(+d[XSelected]))
+            .attr("cy", d => yScale(+d[YSelected]))
 
     d3.select("#yAxis")
         .style("transform", "translate(30px, -5px)")
@@ -106,13 +110,16 @@ function showDataDisp(data) {
     d3.select("#xAxis")
         .style("transform", `translate(30px, 665px)`)
         .call(d3.axisBottom(xScale))
+
+    join.exit()
+        .remove()
+    console.log(join)
 }
 
 function showDataBar1(data) {
     let element  = document.getElementById('carta');
     var bodyWidth = element.offsetWidth;
     var bodyHeight = element.offsetHeight;
-    //console.log(data);
 
     let variableX = document.getElementById("variableX");
     var XSelected = variableX.options[variableX.selectedIndex].id.toString();
@@ -131,18 +138,20 @@ function showDataBar1(data) {
         .range([bodyHeight,0])
         .domain([0, d3.max(data, d => d[YSelected])])
 
-    barCharBody = barchart.select("#body")
-        .selectAll("rect")
+    join = body.selectAll("rect")
         .data(data)
     
-    barCharBody.enter()
+    join.enter()
         .append("rect")
-        .attr("fill", "#556677")
-        .attr("width", xScale.bandwidth())
-        .attr("height", d => (bodyHeight - yScale(d[YSelected])))
-        .attr("y", d => yScale(d[YSelected]))
-        .attr("x", d => xScale(d[XSelected]))
-    
+        .merge(join)
+        .transition()
+        .duration(1000)
+            .attr("fill", "#556677")
+            .attr("width", xScale.bandwidth())
+            .attr("height", d => (bodyHeight - yScale(d[YSelected])))
+            .attr("y", d => yScale(d[YSelected]))
+            .attr("x", d => xScale(d[XSelected]))
+        
     d3.select("#yAxis")
         .style("transform", "translate(30px, -5px)")
         .call(d3.axisLeft(yScale))
@@ -151,5 +160,107 @@ function showDataBar1(data) {
         .style("transform", `translate(30px, 665px)`)
         .call(d3.axisBottom(xScale))
 
-    console.log("Melo")
+    join.exit()
+        .remove()
 }
+
+function showDataBar2(data) {
+    let element  = document.getElementById('carta');
+    var bodyWidth = element.offsetWidth;
+    var bodyHeight = element.offsetHeight;
+
+    let variableX = document.getElementById("variableY");
+    var XSelected = variableX.options[variableX.selectedIndex].id.toString();
+    // console.log(XSelected);
+
+    let variableY = document.getElementById("variableX");
+    var YSelected = variableY.options[variableY.selectedIndex].id.toString();
+    // console.log(YSelected);
+
+    let xScale = d3.scaleBand()
+        .range([0,bodyWidth])
+        .domain(data.map(d => d[XSelected]))
+        .padding(0.2)
+
+    let yScale = d3.scaleLinear()
+        .range([bodyHeight,0])
+        .domain([0, d3.max(data, d => d[YSelected])])
+
+    join = body.selectAll("rect")
+        .data(data)
+    
+    join.enter()
+        .append("rect")
+        .merge(join)
+        .transition()
+        .duration(1000)
+            .attr("fill", "#556677")
+            .attr("width", xScale.bandwidth())
+            .attr("height", d => (bodyHeight - yScale(d[YSelected])))
+            .attr("y", d => yScale(d[YSelected]))
+            .attr("x", d => xScale(d[XSelected]))
+            .attr("transform", d => `translate(0,0)`)
+        
+    d3.select("#yAxis")
+        .style("transform", "translate(30px, -5px)")
+        .call(d3.axisLeft(yScale))
+
+    d3.select("#xAxis")
+        .style("transform", `translate(30px, 665px)`)
+        .call(d3.axisBottom(xScale))
+
+    join.exit()
+        .remove()
+}
+// function showDataBar2(data) {
+//     let element  = document.getElementById('carta');
+//     var bodyWidth = element.offsetWidth;
+//     var bodyHeight = element.offsetHeight;
+//     if(join != null){
+//         join.exit().remove()
+//         console.log(join)
+//     }
+//     let variableX = document.getElementById("variableX");
+//     var XSelected = variableX.options[variableX.selectedIndex].id.toString();
+//     // console.log(XSelected);
+
+//     let variableY = document.getElementById("variableY");
+//     var YSelected = variableY.options[variableY.selectedIndex].id.toString();
+//     // console.log(YSelected);
+
+//     let xScale = d3.scaleLinear()
+//         .range([0, bodyWidth])
+//         .domain([0, d3.max(data, d => d[XSelected])])
+
+//     let yScale = d3.scaleBand()
+//         .range([0,bodyHeight])
+//         .domain(data.map(d => d[YSelected]))
+//         .padding(0.1)
+
+//     join = body.selectAll("rect")
+//         .data(data)
+    
+//     join.enter()
+//         .append("rect")
+//         .merge(join)
+//         .transition()
+//         .duration(1000)
+//             .attr("x", d => xScale(0))
+//             .attr("y", d => yScale(d[YSelected]))
+//             .attr("width", d => xScale(d[YSelected]))
+//             .attr("height", yScale.bandwidth())
+//             .attr("fill", "#556677")
+//             .attr("transform", d => `translate(-400,0)`)
+        
+//     d3.select("#yAxis")
+//         .style("transform", "translate(30px, -5px)")
+//         .call(d3.axisLeft(yScale))
+
+//     d3.select("#xAxis")
+//         .style("transform", `translate(30px, 665px)`)
+//         .call(d3.axisBottom(xScale))
+
+//     console.log("Melo")
+//     join.exit()
+//         .remove()
+// }
